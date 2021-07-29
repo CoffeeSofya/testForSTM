@@ -1,63 +1,104 @@
 //URL-адрес сервера
-let URL_SERVER = 'https://randomuser.me/api/?results=15';
-//Наименования колонок таблицы "users__table"
-let COLUMN_NAMES = ['Name', 'Picture', 'Location', 'Email', 'Phone', 'Registered date'];
+const URL_SERVER = 'https://randomuser.me/api/?results=15';
+//Наименования колонок таблицы 'users__table'
+const COLUMN_NAMES = ['Name', 'Picture', 'Location', 'Email', 'Phone', 'Registered date'];
+let data;
 
 //Функция принимает данные о пользователях в формате json
 //Рисует таблицу на основе пришедших данных
-const createTemplate = data => {
+const createTable = () => {
   let table = document.getElementById('users__table');
  
-  let tr1 = document.createElement('tr');
-  for (let k = 0; k < 6; k++) {
-    let td = document.createElement('td');
-    td.innerHTML = COLUMN_NAMES[k]
-    tr1.appendChild(td);
-  }
-  table.appendChild(tr1);
+  let header = createHeader();
+  table.appendChild(header);
 
   for (let i = 0; i < 15; i++) {
-    let tr = document.createElement('tr');
-    for (let j = 0; j < 6; j++) {
-      let td1 = document.createElement('td');
-      if (j === 0) {
-        td1.id = 'fullName';
-        td1.innerHTML = data.results[i].name.first + ' ' + data.results[i].name.last;
-      } 
-      else if (j === 1) {
-        td1.className = 'picture';
-
-        let img = document.createElement('IMG');
-        img.src = data.results[i].picture.thumbnail;
-        img.id = 'picContainer';
-        img.className = `picContainer ${i}`;
-        img.addEventListener('mouseover', showTooltip);
-        img.addEventListener('mouseout', hideTooltip);
-        
-        let picHolder = document.createElement('div');
-        picHolder.id = 'picHolder';
-        picHolder.className = `picHolder ${i}`;
-        picHolder.style.display = 'none';
-        picHolder.style.height = '128px';
-        picHolder.style.width = '128px';
-        picHolder.style.backgroundImage = `url(${data.results[i].picture.large})`;
-
-        td1.appendChild(img);
-        td1.appendChild(picHolder);
-      } 
-      else if (j === 2) td1.innerHTML = data.results[i].location.state + ' ' + data.results[i].location.city;
-      else if (j === 3) td1.innerHTML = data.results[i].email;
-      else if (j === 4) td1.innerHTML = data.results[i].phone;
-      else if (j === 5) td1.innerHTML =  formatDate(data.results[i].registered.date);
-      tr.appendChild(td1); 
-    }
-    table.appendChild(tr);
+    let row = createRow(i);
+    table.appendChild(row);
   }
   document.getElementById('loadingImg').style.display = 'none';
-  document.appendChild(table);
+  document.getElementById('search-id').style.display = 'block';
 }  
 
+//Функция создания заголовка таблицы
+//Возвращает строку заголовка таблицы
+function createHeader() {
+  let rowHeader = document.createElement('tr');
+  for (let i = 0; i < COLUMN_NAMES.length; i++) {
+    let column = document.createElement('td');
+    column.innerHTML = COLUMN_NAMES[i]
+    rowHeader.appendChild(column);
+  }
+  return rowHeader;
+}
 
+//Функция создания строки с данными пользователя
+//Получает индекс пользователя
+//Возвращает заполненную строку
+function createRow(index) {
+  let tr = document.createElement('tr');
+  for (let i = 0; i < COLUMN_NAMES.length; i++) {
+    let td = document.createElement('td');
+    if (i === 0) {
+      td.id = 'fullName';
+      td.innerHTML = getField(index, 'fullName');
+    } 
+    else if (i === 1) {
+      td.className = 'picture';
+      let img = getImage(index);
+      td.appendChild(img);
+
+      picHolder = getTooltipImg(index);   
+      td.appendChild(picHolder);
+    } 
+    else if (i === 2) td.innerHTML = getField(index, 'location');
+    else if (i === 3) td.innerHTML = getField(index, 'email');
+    else if (i === 4) td.innerHTML = getField(index, 'phone');
+    else if (i === 5) td.innerHTML = getField(index, 'date');
+    tr.appendChild(td); 
+  }
+  return tr;
+}
+
+//Функция получения данных пользователя
+//Получает индекс пользователя и данные для поиска
+//Возвращает данные пользователя
+function getField(index, userData) {
+  let value;
+  if (userData === 'fullName') value = data.results[index].name.first + ' ' + data.results[index].name.last;
+  else if (userData === 'location') value = data.results[index].location.state + ' ' + data.results[index].location.city;
+  else if (userData === 'email') value = data.results[index].email;
+  else if (userData === 'phone') value = data.results[index].phone;
+  else if (userData === 'date') value = formatDate(data.results[index].registered.date);
+  else console.log('User data not found');
+  return value;
+}
+
+//Функция получения изображения профиля
+//Получает индекс пользователя
+//Возвращает изображение
+function getImage(index) {
+  let img = document.createElement('IMG');
+  img.src = data.results[index].picture.thumbnail;
+  img.id = 'picContainer';
+  img.className = `picContainer ${index}`;
+  img.addEventListener('mouseover', showTooltip);
+  img.addEventListener('mouseout', hideTooltip);
+  return img;
+}
+
+//Функция получения тултипа изображения профиля
+//Получает индекс пользователя
+//Возвращает тултип
+function getTooltipImg(index) {
+  let picHolder = document.createElement('div');
+  picHolder.id = 'picHolder';
+  picHolder.className = `picHolder ${index}`;
+  picHolder.style.backgroundImage = `url(${data.results[index].picture.large})`;
+  picHolder.style.width = '128px';
+  picHolder.style.height = '128px';
+  return picHolder;
+}
 
 //Принимает неотформатированное значение даты регистрации пользователя
 //Форматирует дату
@@ -83,25 +124,27 @@ function searchByName() {
 
   for (i = 1; i < tr.length; i++) {
     td = tr[i].getElementsByTagName('td')[0];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      let arr = txtValue.split(' ');
-      if (filterFullName.length == 1) {
-        if (arr[0].toUpperCase().indexOf(filterFullName[0]) == 0 || arr[1].toUpperCase().indexOf(filterFullName[0]) == 0) {
-          tr[i].style.display = '';
-        } else {
-          tr[i].style.display = 'none';
-        }
+    txtValue = td.textContent || td.innerText;
+    let arr = txtValue.split(' ');
+    if (filterFullName.length == 1) {
+      if (arr[0].toUpperCase().indexOf(filterFullName[0]) == 0 || arr[1].toUpperCase().indexOf(filterFullName[0]) == 0) {
+        tr[i].style.display = '';
       } else {
-        if (arr[0].toUpperCase().indexOf(filterFullName[0]) == 0 && arr[1].toUpperCase().indexOf(filterFullName[1]) == 0 || 
-            arr[0].toUpperCase().indexOf(filterFullName[1]) == 0 && arr[1].toUpperCase().indexOf(filterFullName[0]) == 0) {
-          tr[i].style.display = '';
-        } else {
-          tr[i].style.display = 'none';
-        }
+        tr[i].style.display = 'none';
       }
-    } else{
-      document.getElementsByClassName('not-found-user').style.display = 'block';
+    } else {
+      if (arr[0].toUpperCase().indexOf(filterFullName[0]) == 0 && arr[1].toUpperCase().indexOf(filterFullName[1]) == 0 || 
+           arr[0].toUpperCase().indexOf(filterFullName[1]) == 0 && arr[1].toUpperCase().indexOf(filterFullName[0]) == 0) {
+        tr[i].style.display = '';
+      } else {
+        tr[i].style.display = 'none';
+      }
+    }
+  }
+  
+  for (i = 1; i < tr.length; i++) {
+    if (tr[i].display == undefined) {
+      document.getElementById('not-found').style.display = 'block';
     }
   }
 }
@@ -113,7 +156,8 @@ const getUsers = url => {
   fetch(url)
        .then(response => response.json())
        .then(json => {
-          createTemplate(json);
+          data = json;
+          createTable();
        })
 }
   
@@ -141,8 +185,7 @@ function resetSearch() {
   table = document.getElementById('users__table');
   tr = table.getElementsByTagName('tr');
   for (i = 1; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName('td')[0];
-    if (td) tr[i].style.display = '';
+    tr[i].style.display = '';
   }
 }
 

@@ -13,14 +13,14 @@
         <div id="loadingImg" class="loading-img">
             <img src="https://acegif.com/wp-content/uploads/loading-37.gif" alt="">
         </div>
-        <div id="search-id" class="search">
+        <div id="search-id" class="search" style="display: none;">
             <input id="input-search" class="input-search-users" type="text" onkeyup="searchByName()" placeholder="Search..">
             <button class="btn-reset" onclick="resetSearch()">
                 <span class="close" aria-hidden="true">×</span>
             </button>
         </div>
         <div id="users__table"></div>
-        <div class="not-found-user">
+        <div id="not-found" class="not-found-user" style="display: none;">
             <h3>Пользователь не найден</h3>
         </div>
     </div>

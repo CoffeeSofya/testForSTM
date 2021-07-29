@@ -74,7 +74,7 @@ tr:hover {
     background: #ececec;
 }
 
-.picture{
+.picture {
     display: flex;
     position: relative;
 }
@@ -84,7 +84,6 @@ tr:hover {
     bottom: -50px;
     padding: 10px;
     background: #fff no-repeat 10px 10px;
-    background-image: none;
     display: none;
 }
 
@@ -93,8 +92,7 @@ tr:hover {
     height: 48px;
 }
 
-.not-found-user{
-    display: none;
+.not-found-user {
     color: #918e8e;
     font-family: 'Roboto', sans-serif;
 }
