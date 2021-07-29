@@ -117,8 +117,7 @@ function formatDate(date) {
 //Сравнивает значения из поля ввода и колонки "Name" и скрывает неподходящие элементы
 function searchByName() {
   let input = document.getElementById('input-search');
-  let filter = input.value.toUpperCase();
-  let filterFullName = filter.split(' ');
+  let filterFullName = input.value.toUpperCase().split(' ');
   let table = document.getElementById('users__table');
   let tr = table.getElementsByTagName('tr');
 
@@ -126,6 +125,7 @@ function searchByName() {
     td = tr[i].getElementsByTagName('td')[0];
     txtValue = td.textContent || td.innerText;
     let arr = txtValue.split(' ');
+
     if (filterFullName.length == 1) {
       if (arr[0].toUpperCase().indexOf(filterFullName[0]) == 0 || arr[1].toUpperCase().indexOf(filterFullName[0]) == 0) {
         tr[i].style.display = '';
@@ -140,12 +140,7 @@ function searchByName() {
         tr[i].style.display = 'none';
       }
     }
-  }
-  
-  for (i = 1; i < tr.length; i++) {
-    if (tr[i].display == undefined) {
-      document.getElementById('not-found').style.display = 'block';
-    }
+    // document.getElementById('not-found').style.display = 'block';
   }
 }
 
